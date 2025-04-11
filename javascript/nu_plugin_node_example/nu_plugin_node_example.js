@@ -10,7 +10,7 @@
  */
 
 // Configuration constants
-const { NUSHELL_VERSION } = require("../version");
+const { NUSHELL_VERSION } = require("../../version");
 const PLUGIN_VERSION = '0.1.1';
 
 // Core protocol functions
