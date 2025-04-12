@@ -58,6 +58,11 @@ jobs:
             tests-dir: ./rust/nu_plugin_example
             needs:
               - rust
+          - name: nu_plugin_custom_values
+            plugin: ./target/release/nu_plugin_custom_values
+            tests-dir: ./rust/nu_plugin_custom_values
+            needs:
+              - rust
     
     steps:
       - name: Checkout Repo
