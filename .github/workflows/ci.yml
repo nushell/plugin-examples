@@ -7,8 +7,32 @@ env:
   testing-file: https://raw.githubusercontent.com/nushell/nushell/6a759abcbd9bdc6fb4bbd60144e309bd1a79786b/crates/nu-std/testing.nu
 
 jobs:
+  build-nu:
+    name: Build Nushell from `main`
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Nushell `main` branch
+        uses: actions/checkout@v4
+        with:
+          repository: nushell/nushell
+      
+      - name: Setup Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Build Nushell binary
+        run: cargo build --release --bin nu
+
+      - name: Upload Nushell binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: nu
+          path: target/release/nu
+          if-no-files-found: error
+
+
   test-node:
     name: test-node (${{ matrix.plugin }})
+    needs: build-nu
     runs-on: ubuntu-latest
 
     strategy:
@@ -18,10 +42,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: volta-cli/action@v4
-      - uses: hustcer/setup-nu@v3
+      
+      - name: Setup Node
+        uses: volta-cli/action@v4
+
+      - name: Download Nushell Binary
+        uses: actions/download-artifact@v4
         with:
-          version: nightly
+          name: nu
 
       # - name: Download testing.nu
       #   run: wget ${{ env.testing-file }}
@@ -30,11 +58,12 @@ jobs:
         run: chmod +x ./javascript/${{ matrix.plugin }}/${{ matrix.plugin }}.js
 
       - name: Run tests
-        run: nu -c 'use testing.nu; testing run-tests --path ./javascript/${{ matrix.plugin }} --plugins ["./javascript/${{ matrix.plugin }}/${{ matrix.plugin}}.js"]'
+        run: ./nu -n -c 'use testing.nu; testing run-tests --path ./javascript/${{ matrix.plugin }} --plugins ["./javascript/${{ matrix.plugin }}/${{ matrix.plugin}}.js"]'
 
 
   test-python:
     name: test-python (${{ matrix.plugin }})
+    needs: build-nu
     runs-on: ubuntu-latest
 
     strategy:
@@ -44,12 +73,16 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version-file: ".python-version" 
-      - uses: hustcer/setup-nu@v3
+
+      - name: Download Nushell Binary
+        uses: actions/download-artifact@v4
         with:
-          version: nightly
+          name: nu
 
       # - name: Download testing.nu
       #   run: wget ${{ env.testing-file }}
@@ -58,5 +91,5 @@ jobs:
         run: chmod +x ./python/${{ matrix.plugin }}/${{ matrix.plugin }}.py
 
       - name: Run tests
-        run: nu -c 'use testing.nu; testing run-tests --path ./python/${{ matrix.plugin }} --plugins ["./python/${{ matrix.plugin }}/${{ matrix.plugin}}.py"]'
+        run: ./nu -n -c 'use testing.nu; testing run-tests --path ./python/${{ matrix.plugin }} --plugins ["./python/${{ matrix.plugin }}/${{ matrix.plugin}}.py"]'
       
