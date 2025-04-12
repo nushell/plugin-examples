@@ -83,7 +83,7 @@ jobs:
 
       - if: contains(matrix.plugin.needs, 'rust')
         name: Build Rust-based Plugin
-        run: cargo build --release ${{ matrix.plugin.name }}
+        run: cargo build --release --package ${{ matrix.plugin.name }}
 
       - name: Download Nushell Binary
         uses: actions/download-artifact@v4
