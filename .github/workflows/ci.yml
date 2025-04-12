@@ -50,7 +50,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nu
-      - run: chmod +x ./nu
+          
+      - name: Ensure Nushell binary is executable
+        run: chmod +x ./nu
 
       # - name: Download testing.nu
       #   run: wget ${{ env.testing-file }}
@@ -84,7 +86,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nu
-      - run: chmod +x ./nu
+
+      - name: Ensure Nushell binary is executable
+        run: chmod +x ./nu
 
       # - name: Download testing.nu
       #   run: wget ${{ env.testing-file }}
