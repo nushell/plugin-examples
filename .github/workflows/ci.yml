@@ -23,8 +23,8 @@ jobs:
         with:
           version: nightly
 
-      - name: Download testing.nu
-        run: wget ${{ env.testing-file }}
+      # - name: Download testing.nu
+      #   run: wget ${{ env.testing-file }}
 
       - name: Ensure plugin is executable
         run: chmod +x ./javascript/${{ matrix.plugin }}/${{ matrix.plugin }}.js
@@ -51,8 +51,8 @@ jobs:
         with:
           version: nightly
 
-      - name: Download testing.nu
-        run: wget ${{ env.testing-file }}
+      # - name: Download testing.nu
+      #   run: wget ${{ env.testing-file }}
 
       - name: Ensure plugin is executable
         run: chmod +x ./python/${{ matrix.plugin }}/${{ matrix.plugin }}.py
