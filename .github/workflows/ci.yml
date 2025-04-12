@@ -3,9 +3,12 @@ name: continuous-integration
 on:
   push:
 
+env:
+  testing-file: https://raw.githubusercontent.com/nushell/nushell/6a759abcbd9bdc6fb4bbd60144e309bd1a79786b/crates/nu-std/testing.nu
+
 jobs:
   test-node:
-    name: test-node-${{ matrix.plugin }}
+    name: test-node (${{ matrix.plugin }})
     runs-on: ubuntu-latest
 
     strategy:
@@ -21,14 +24,14 @@ jobs:
           version: nightly
 
       - name: Download testing.nu
-        run: wget https://raw.githubusercontent.com/nushell/nushell/6a759abcbd9bdc6fb4bbd60144e309bd1a79786b/crates/nu-std/testing.nu
+        run: wget ${{ env.testing-file }}
 
       - name: Run tests
         run: nu -c 'use testing.nu; testing run-tests --path ./javascript/${{ matrix.plugin }} --plugins ["./javascript/${{ matrix.plugin }}/${{ matrix.plugin}}.js"]'
 
 
   test-python:
-    name: test-python-${{ matrix.plugin }}
+    name: test-python (${{ matrix.plugin }})
     runs-on: ubuntu-latest
 
     strategy:
@@ -44,7 +47,7 @@ jobs:
           version: nightly
 
       - name: Download testing.nu
-        run: wget https://raw.githubusercontent.com/nushell/nushell/6a759abcbd9bdc6fb4bbd60144e309bd1a79786b/crates/nu-std/testing.nu
+        run: wget ${{ env.testing-file }}
 
       - name: Run tests
         run: nu -c 'use testing.nu; testing run-tests --path ./python/${{ matrix.plugin }} --plugins ["./python/${{ matrix.plugin }}/${{ matrix.plugin}}.py"]'
