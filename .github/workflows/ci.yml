@@ -26,6 +26,9 @@ jobs:
       - name: Download testing.nu
         run: wget ${{ env.testing-file }}
 
+      - name: Ensure plugin is executable
+        run: chmod +x ./javascript/${{ matrix.plugin }}/${{ matrix.plugin }}.js
+
       - name: Run tests
         run: nu -c 'use testing.nu; testing run-tests --path ./javascript/${{ matrix.plugin }} --plugins ["./javascript/${{ matrix.plugin }}/${{ matrix.plugin}}.js"]'
 
@@ -41,13 +44,18 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version" 
       - uses: hustcer/setup-nu@v3
         with:
           version: nightly
 
       - name: Download testing.nu
         run: wget ${{ env.testing-file }}
+
+      - name: Ensure plugin is executable
+        run: chmod +x ./python/${{ matrix.plugin }}/${{ matrix.plugin }}.py
 
       - name: Run tests
         run: nu -c 'use testing.nu; testing run-tests --path ./python/${{ matrix.plugin }} --plugins ["./python/${{ matrix.plugin }}/${{ matrix.plugin}}.py"]'
