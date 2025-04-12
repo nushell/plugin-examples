@@ -16,7 +16,7 @@ jobs:
         with:
           repository: nushell/nushell
       
-      - name: Setup Rust Toolchain
+      - name: Setup Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
 
       - name: Build Nushell binary
@@ -50,6 +50,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nu
+      - run: chmod +x ./nu
 
       # - name: Download testing.nu
       #   run: wget ${{ env.testing-file }}
@@ -83,6 +84,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nu
+      - run: chmod +x ./nu
 
       # - name: Download testing.nu
       #   run: wget ${{ env.testing-file }}
