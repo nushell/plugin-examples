@@ -1,0 +1,51 @@
+name: continuous-integration
+
+on:
+  push:
+
+jobs:
+  test-node:
+    name: test-node-${{ matrix.plugin }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        plugin:
+          - nu_plugin_node_example
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: volta-cli/action@v4
+      - uses: hustcer/setup-nu@v3
+        with:
+          version: nightly
+
+      - name: Download testing.nu
+        run: wget https://raw.githubusercontent.com/nushell/nushell/6a759abcbd9bdc6fb4bbd60144e309bd1a79786b/crates/nu-std/testing.nu
+
+      - name: Run tests
+        run: nu -c 'use testing.nu; testing run-tests --path ./javascript/${{ matrix.plugin }} --plugins ["./javascript/${{ matrix.plugin }}/${{ matrix.plugin}}.js"]'
+
+
+  test-python:
+    name: test-python-${{ matrix.plugin }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        plugin:
+          - nu_plugin_python_example
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: hustcer/setup-nu@v3
+        with:
+          version: nightly
+
+      - name: Download testing.nu
+        run: wget https://raw.githubusercontent.com/nushell/nushell/6a759abcbd9bdc6fb4bbd60144e309bd1a79786b/crates/nu-std/testing.nu
+
+      - name: Run tests
+        run: nu -c 'use testing.nu; testing run-tests --path ./python/${{ matrix.plugin }} --plugins ["./python/${{ matrix.plugin }}/${{ matrix.plugin}}.py"]'
+      
