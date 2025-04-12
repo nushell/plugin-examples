@@ -1,2 +1,2 @@
 @echo off
-nu %~dp0nu_plugin_nu_example.nu %*
+nu --stdin %~dp0nu_plugin_nu_example.nu %*

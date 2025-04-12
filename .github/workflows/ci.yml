@@ -64,6 +64,40 @@ jobs:
         run: ./nu -n -c 'use testing.nu; testing run-tests --path ./javascript/${{ matrix.plugin }} --plugins ["./javascript/${{ matrix.plugin }}/${{ matrix.plugin}}.js"]'
 
 
+  test-nushell:
+    name: "Test Nushell-based Plugin: ${{ matrix.plugin }}"
+    needs: build-nu
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        plugin:
+          - nu_plugin_nu_example
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Nushell
+        uses: hustcer/setup-nu@v3
+
+      - name: Download Nushell Binary
+        uses: actions/download-artifact@v4
+        with:
+          name: nu
+
+      - name: Ensure Nushell binary is executable
+        run: chmod +x ./nu
+
+      # - name: Download testing.nu
+      #   run: wget ${{ env.testing-file }}
+
+      - name: Ensure plugin is executable
+        run: chmod +x ./nushell/${{ matrix.plugin }}/${{ matrix.plugin }}.nu
+
+      - name: Run tests
+        run: ./nu -n -c 'use testing.nu; testing run-tests --path ./nushell/${{ matrix.plugin }} --plugins ["./nushell/${{ matrix.plugin }}/${{ matrix.plugin}}.nu"]'
+      
+
   test-python:
     name: "Test Python-based Plugin: ${{ matrix.plugin }}"
     needs: build-nu
