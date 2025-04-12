@@ -26,7 +26,8 @@
 import sys
 import json
 
-from ..version import NUSHELL_VERSION
+sys.path.append("../")
+from version import NUSHELL_VERSION
 PLUGIN_VERSION = "0.1.1"  # bump if you change commands!
 
 
@@ -117,8 +118,8 @@ def process_call(id, plugin_call):
     Use this information to implement your plugin logic
     """
     # Pretty printing the call to stderr
-    sys.stderr.write(json.dumps(plugin_call, indent=4))
-    sys.stderr.write("\n")
+    # sys.stderr.write(json.dumps(plugin_call, indent=4))
+    # sys.stderr.write("\n")
 
     # Get the span from the call
     span = plugin_call["call"]["head"]
@@ -247,6 +248,16 @@ def handle_input(input):
             process_call(id, plugin_call["Run"])
         else:
             write_error(id, "Operation not supported: " + str(plugin_call))
+    elif "Signal" in input:
+        signal = input["Signal"]
+        if signal == "Interrupt":
+            sys.stderr.write("Interrupt signals are not implemented yet.")
+            exit(1)
+        elif signal == "Reset":
+            # do nothing as we don't need to reset our signal state
+            ...
+        else:
+            sys.stderr.write("Unknown signal: " + signal + "\n")
     else:
         sys.stderr.write("Unknown message: " + str(input) + "\n")
         exit(1)
