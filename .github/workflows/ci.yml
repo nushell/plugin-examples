@@ -53,6 +53,11 @@ jobs:
             tests-dir: ./python/nu_plugin_python_example
             needs:
               - python
+          - name: nu_plugin_example
+            plugin: ./target/nu_plugin_example
+            tests-dir: ./rust/nu_plugin_example
+            needs:
+              - rust
     
     steps:
       - name: Checkout Repo
@@ -71,6 +76,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version-file: ".python-version" 
+
+      - if: contains(matrix.plugin.needs, 'rust')
+        name: Setup Rust toolchain and cache
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - if: contains(matrix.plugin.needs, 'rust')
+        name: Build Rust-based Plugin
+        run: cargo build --release ${{ matrix.plugin.name }}
 
       - name: Download Nushell Binary
         uses: actions/download-artifact@v4
