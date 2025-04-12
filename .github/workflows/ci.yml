@@ -31,7 +31,7 @@ jobs:
 
 
   test-node:
-    name: test-node (${{ matrix.plugin }})
+    name: "Test Node-based Plugin: ${{ matrix.plugin }}"
     needs: build-nu
     runs-on: ubuntu-latest
 
@@ -50,7 +50,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nu
-          
+
       - name: Ensure Nushell binary is executable
         run: chmod +x ./nu
 
@@ -65,7 +65,7 @@ jobs:
 
 
   test-python:
-    name: test-python (${{ matrix.plugin }})
+    name: "Test Python-based Plugin: ${{ matrix.plugin }}"
     needs: build-nu
     runs-on: ubuntu-latest
 
