@@ -54,7 +54,7 @@ jobs:
             needs:
               - python
           - name: nu_plugin_example
-            plugin: ./target/nu_plugin_example
+            plugin: ./target/release/nu_plugin_example
             tests-dir: ./rust/nu_plugin_example
             needs:
               - rust
