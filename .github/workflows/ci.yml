@@ -30,88 +30,44 @@ jobs:
           if-no-files-found: error
 
 
-  test-node:
-    name: "Test Node-based Plugin: ${{ matrix.plugin }}"
+  test-plugin:
+    name: "Test Plugin: ${{ matrix.plugin.name }}"
     needs: build-nu
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         plugin:
-          - nu_plugin_node_example
-
+          - name: nu_plugin_node_example
+            plugin: ./javascript/nu_plugin_node_example/nu_plugin_node_example.js
+            tests-dir: ./javascript/nu_plugin_node_example
+            needs:
+              - node
+          - name: nu_plugin_nu_example
+            plugin: ./nushell/nu_plugin_nu_example/nu_plugin_nu_example.nu
+            tests-dir: ./nushell/nu_plugin_nu_example
+            needs:
+              - nushell
+          - name: nu_plugin_python_example
+            plugin: ./python/nu_plugin_python_example/nu_plugin_python_example.py
+            tests-dir: ./python/nu_plugin_python_example
+            needs:
+              - python
+    
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - if: contains(matrix.plugin.needs, 'node')
+        name: Setup Node
         uses: volta-cli/action@v4
 
-      - name: Download Nushell Binary
-        uses: actions/download-artifact@v4
-        with:
-          name: nu
-
-      - name: Ensure Nushell binary is executable
-        run: chmod +x ./nu
-
-      # - name: Download testing.nu
-      #   run: wget ${{ env.testing-file }}
-
-      - name: Ensure plugin is executable
-        run: chmod +x ./javascript/${{ matrix.plugin }}/${{ matrix.plugin }}.js
-
-      - name: Run tests
-        run: ./nu -n -c 'use testing.nu; testing run-tests --path ./javascript/${{ matrix.plugin }} --plugins ["./javascript/${{ matrix.plugin }}/${{ matrix.plugin}}.js"]'
-
-
-  test-nushell:
-    name: "Test Nushell-based Plugin: ${{ matrix.plugin }}"
-    needs: build-nu
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        plugin:
-          - nu_plugin_nu_example
-    
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Nushell
+      - if: contains(matrix.plugin.needs, 'nushell')
+        name: Setup Nushell
         uses: hustcer/setup-nu@v3
 
-      - name: Download Nushell Binary
-        uses: actions/download-artifact@v4
-        with:
-          name: nu
-
-      - name: Ensure Nushell binary is executable
-        run: chmod +x ./nu
-
-      # - name: Download testing.nu
-      #   run: wget ${{ env.testing-file }}
-
-      - name: Ensure plugin is executable
-        run: chmod +x ./nushell/${{ matrix.plugin }}/${{ matrix.plugin }}.nu
-
-      - name: Run tests
-        run: ./nu -n -c 'use testing.nu; testing run-tests --path ./nushell/${{ matrix.plugin }} --plugins ["./nushell/${{ matrix.plugin }}/${{ matrix.plugin}}.nu"]'
-      
-
-  test-python:
-    name: "Test Python-based Plugin: ${{ matrix.plugin }}"
-    needs: build-nu
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        plugin:
-          - nu_plugin_python_example
-    
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Python
+      - if: contains(matrix.plugin.needs, 'python')
+        name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version-file: ".python-version" 
@@ -128,8 +84,7 @@ jobs:
       #   run: wget ${{ env.testing-file }}
 
       - name: Ensure plugin is executable
-        run: chmod +x ./python/${{ matrix.plugin }}/${{ matrix.plugin }}.py
+        run: chmod +x ${{ matrix.plugin.plugin }}
 
       - name: Run tests
-        run: ./nu -n -c 'use testing.nu; testing run-tests --path ./python/${{ matrix.plugin }} --plugins ["./python/${{ matrix.plugin }}/${{ matrix.plugin}}.py"]'
-      
+        run: ./nu -n -c 'use testing.nu; testing run-tests --path ${{ matrix.plugin.tests-dir }} --plugins ["${{ matrix.plugin.plugin }}"]'
