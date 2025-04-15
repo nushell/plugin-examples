@@ -98,8 +98,8 @@ jobs:
       - name: Ensure Nushell binary is executable
         run: chmod +x ./nu
 
-      # - name: Download testing.nu
-      #   run: wget ${{ env.testing-file }}
+      - name: Download testing.nu
+        run: wget ${{ env.testing-file }}
 
       - name: Ensure plugin is executable
         run: chmod +x ${{ matrix.plugin.plugin }}
