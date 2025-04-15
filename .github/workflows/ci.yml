@@ -2,6 +2,11 @@ name: continuous-integration
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    - cron: '0 7 * * *' # daily at 07:00 UTC
 
 env:
   testing-file: https://raw.githubusercontent.com/nushell/nushell/6a759abcbd9bdc6fb4bbd60144e309bd1a79786b/crates/nu-std/testing.nu
