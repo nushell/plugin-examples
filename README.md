@@ -21,3 +21,24 @@ Each folder usually includes:
 
 Every plugin is also listed in the [CI workflow](./.github/workflows/ci.yml) to 
 ensure it gets tested regularly.  
+
+## Write your own plugin
+
+This repo contains examples of how to implement specific behaviors in Nushell 
+plugins.
+If you want to stream data, return a table, handle arguments, or work with 
+custom types, there's likely an example here that shows how to do it.
+
+To build your own plugin from scratch:
+
+- Start with our official plugin template for a clean setup:  
+  👉 [nushell/nu_plugin_template](https://github.com/nushell/nu_plugin_template)
+
+- Read the full plugin guide in the Nushell book:  
+  📚 [Plugin guide on nushell.sh](https://www.nushell.sh/contributor-book/plugins.html)
+
+You might need to update the Nushell dependencies in the plugin template, 
+since it can lag behind the latest 
+[nushell](https://github.com/nushell/nushell) version.  
+For more real-world plugins, check out  
+[nushell/awesome-nu](https://github.com/nushell/awesome-nu?tab=readme-ov-file#plugins).
