@@ -1,0 +1,117 @@
+name: continuous-integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    - cron: '0 7 * * *' # daily at 07:00 UTC
+
+env:
+  testing-file: https://raw.githubusercontent.com/nushell/nushell/6a759abcbd9bdc6fb4bbd60144e309bd1a79786b/crates/nu-std/testing.nu
+
+jobs:
+  build-nu:
+    name: Build Nushell from `main`
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Nushell `main` branch
+        uses: actions/checkout@v4
+        with:
+          repository: nushell/nushell
+      
+      - name: Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Build Nushell binary
+        run: cargo build --release --bin nu
+
+      - name: Upload Nushell binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: nu
+          path: target/release/nu
+          if-no-files-found: error
+
+
+  test-plugin:
+    name: "Test Plugin: ${{ matrix.plugin.name }}"
+    needs: build-nu
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        plugin:
+          - name: nu_plugin_node_example
+            plugin: ./javascript/nu_plugin_node_example/nu_plugin_node_example.js
+            tests-dir: ./javascript/nu_plugin_node_example
+            needs:
+              - node
+          - name: nu_plugin_nu_example
+            plugin: ./nushell/nu_plugin_nu_example/nu_plugin_nu_example.nu
+            tests-dir: ./nushell/nu_plugin_nu_example
+            needs:
+              - nushell
+          - name: nu_plugin_python_example
+            plugin: ./python/nu_plugin_python_example/nu_plugin_python_example.py
+            tests-dir: ./python/nu_plugin_python_example
+            needs:
+              - python
+          - name: nu_plugin_example
+            plugin: ./target/release/nu_plugin_example
+            tests-dir: ./rust/nu_plugin_example
+            needs:
+              - rust
+          - name: nu_plugin_custom_values
+            plugin: ./target/release/nu_plugin_custom_values
+            tests-dir: ./rust/nu_plugin_custom_values
+            needs:
+              - rust
+    
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - if: contains(matrix.plugin.needs, 'node')
+        name: Setup Node
+        uses: volta-cli/action@v4
+
+      - if: contains(matrix.plugin.needs, 'nushell')
+        name: Setup Nushell
+        uses: hustcer/setup-nu@v3
+
+      - if: contains(matrix.plugin.needs, 'python')
+        name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version" 
+
+      - if: contains(matrix.plugin.needs, 'rust')
+        name: Setup Rust toolchain and cache
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - if: contains(matrix.plugin.needs, 'rust')
+        name: Build Rust-based Plugin
+        run: cargo build --release --package ${{ matrix.plugin.name }}
+
+      - name: Download Nushell Binary
+        uses: actions/download-artifact@v4
+        with:
+          name: nu
+
+      - name: Ensure Nushell binary is executable
+        run: chmod +x ./nu
+
+      - name: Download testing.nu
+        run: wget ${{ env.testing-file }}
+
+      - name: Ensure plugin is executable
+        run: chmod +x ${{ matrix.plugin.plugin }}
+
+      - name: Run tests
+        run: ./nu -n -c 'use testing.nu; testing run-tests --path ${{ matrix.plugin.tests-dir }} --plugins ["${{ matrix.plugin.plugin }}"]'
+
+      - if: contains(matrix.plugin.needs, 'rust')
+        name: Run Rust-based tests
+        run: cargo test --package ${{ matrix.plugin.name }}
