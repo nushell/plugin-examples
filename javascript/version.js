@@ -1,3 +1,3 @@
 module.exports = {
-  NUSHELL_VERSION: "0.103.1",
+  NUSHELL_VERSION: "0.104",
 }

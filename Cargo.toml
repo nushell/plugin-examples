@@ -6,9 +6,9 @@ members = [
 ]
 
 [workspace.dependencies]
-nu-plugin = { version = "0.103.1", git = "https://github.com/nushell/nushell.git" }
-nu-protocol = { version = "0.103.1", git = "https://github.com/nushell/nushell.git" }
-nu-plugin-test-support = { version = "0.103.1", git = "https://github.com/nushell/nushell.git" }
-nu-cmd-lang = { version = "0.103.1", git = "https://github.com/nushell/nushell.git" }
+nu-plugin = { version = "0.104", git = "https://github.com/nushell/nushell.git" }
+nu-protocol = { version = "0.104", git = "https://github.com/nushell/nushell.git" }
+nu-plugin-test-support = { version = "0.104", git = "https://github.com/nushell/nushell.git" }
+nu-cmd-lang = { version = "0.104", git = "https://github.com/nushell/nushell.git" }
 
 serde = "1.0"
