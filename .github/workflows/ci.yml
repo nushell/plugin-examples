@@ -105,13 +105,13 @@ jobs:
         with:
           repository: nushell/nushell
           sparse-checkout: crates/nu-std/testing.nu
-          path: /nushell
+          path: nushell
 
       - name: Ensure plugin is executable
         run: chmod +x ${{ matrix.plugin.plugin }}
 
       - name: Run tests
-        run: ./nu -n -c 'use /nushell/crates/nu-std/testing.nu; testing run-tests --path ${{ matrix.plugin.tests-dir }} --plugins ["${{ matrix.plugin.plugin }}"]'
+        run: ./nu -n -c 'use nushell/crates/nu-std/testing.nu; testing run-tests --path ${{ matrix.plugin.tests-dir }} --plugins ["${{ matrix.plugin.plugin }}"]'
 
       - if: contains(matrix.plugin.needs, 'rust')
         name: Run Rust-based tests
