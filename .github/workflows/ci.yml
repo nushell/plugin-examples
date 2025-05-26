@@ -8,9 +8,6 @@ on:
   schedule:
     - cron: '0 7 * * *' # daily at 07:00 UTC
 
-env:
-  testing-file: https://raw.githubusercontent.com/nushell/nushell/6a759abcbd9bdc6fb4bbd60144e309bd1a79786b/crates/nu-std/testing.nu
-
 jobs:
   build-nu:
     name: Build Nushell from `main`
@@ -103,14 +100,18 @@ jobs:
       - name: Ensure Nushell binary is executable
         run: chmod +x ./nu
 
-      - name: Download testing.nu
-        run: wget ${{ env.testing-file }}
+      - name: Checkout testing.nu
+        uses: actions/checkout@v4
+        with:
+          repository: nushell/nushell
+          sparse-checkout: crates/nu-std/testing.nu
+          path: .nushell
 
       - name: Ensure plugin is executable
         run: chmod +x ${{ matrix.plugin.plugin }}
 
       - name: Run tests
-        run: ./nu -n -c 'use testing.nu; testing run-tests --path ${{ matrix.plugin.tests-dir }} --plugins ["${{ matrix.plugin.plugin }}"]'
+        run: ./nu -n -c 'use .nushell/crates/nu-std/testing.nu; testing run-tests --path ${{ matrix.plugin.tests-dir }} --plugins ["${{ matrix.plugin.plugin }}"]'
 
       - if: contains(matrix.plugin.needs, 'rust')
         name: Run Rust-based tests
