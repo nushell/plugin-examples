@@ -1,1 +1,1 @@
-export const NUSHELL_VERSION = "0.105.2"
+export const NUSHELL_VERSION = "0.106.2"
