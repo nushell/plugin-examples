@@ -20,10 +20,13 @@ The configuration for the plugin lives in `$env.config.plugins.example`:
 ```nushell
 $env.config = {
   plugins: {
-    example: [
-      some
-      values
-    ]
+    example: {
+      path: "a/b/c.txt"
+      nested: {
+        bool: true,
+        string: "Foo",
+      }
+    }
   }
 }
 ```
