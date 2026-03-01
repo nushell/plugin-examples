@@ -1,6 +1,5 @@
 use nu_protocol::{
-    ast::{self, Math, Operator},
-    CustomValue, ShellError, Span, Type, Value,
+    CustomValue, ShellError, Span, Type, Value, ast::{self, Math, Operator}, casing::Casing
 };
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -68,6 +67,7 @@ impl CustomValue for CoolCustomValue {
         _self_span: Span,
         index: usize,
         path_span: Span,
+        _optional: bool,
     ) -> Result<Value, ShellError> {
         if index == 0 {
             Ok(Value::string(&self.cool, path_span))
@@ -84,6 +84,8 @@ impl CustomValue for CoolCustomValue {
         self_span: Span,
         column_name: String,
         path_span: Span,
+        _optional: bool,
+        _casing: Casing,
     ) -> Result<Value, ShellError> {
         if column_name == "cool" {
             Ok(Value::string(&self.cool, path_span))
